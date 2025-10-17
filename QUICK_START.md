@@ -9,13 +9,17 @@ Esta guía te ayudará a poner en marcha el proyecto en menos de 5 minutos.
 git clone git@github.com:delapazfonseca21/crud_tareas.git
 cd crud_tareas
 
-# 2. Configurar base de datos PostgreSQL
-createdb tasks_db
+# 2. Levantar PostgreSQL con Docker
+docker run --name postgres-tasks \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=tasks_db \
+  -p 5432:5432 \
+  -d postgres:14-alpine
 
 # 3. Backend
 cd backend
 cp .env.example .env
-# Editar .env con tus credenciales de PostgreSQL
+# Editar .env (las credenciales por defecto ya funcionan con Docker)
 npm install
 npm run start:dev
 
@@ -32,7 +36,7 @@ Asegúrate de tener instalado:
 
 - ✅ Node.js >= 18.x
 - ✅ npm >= 9.x
-- ✅ PostgreSQL >= 14.x
+- ✅ Docker
 - ✅ Git
 
 ### Verificar versiones
@@ -40,12 +44,49 @@ Asegúrate de tener instalado:
 ```bash
 node --version    # Debe ser >= 18
 npm --version     # Debe ser >= 9
-psql --version    # Debe ser >= 14
+docker --version  # Debe estar instalado
 ```
 
-## 🗄️ Configurar Base de Datos
+## 🗄️ Configurar Base de Datos con Docker
 
-### Opción 1: PostgreSQL Local
+### Opción 1: Docker (Recomendada)
+
+Levantar PostgreSQL en un contenedor Docker:
+
+```bash
+# Levantar PostgreSQL
+docker run --name postgres-tasks \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=tasks_db \
+  -p 5432:5432 \
+  -d postgres:14-alpine
+
+# Ver logs
+docker logs -f postgres-tasks
+
+# Verificar que está corriendo
+docker ps | grep postgres-tasks
+
+# Detener
+docker stop postgres-tasks
+
+# Iniciar nuevamente
+docker start postgres-tasks
+
+# Eliminar contenedor (y sus datos)
+docker rm -f postgres-tasks
+```
+
+**Credenciales por defecto** (ya configuradas en `backend/.env.example`):
+- Host: `localhost`
+- Port: `5432`
+- Usuario: `postgres`
+- Password: `postgres`
+- Database: `tasks_db`
+
+### Opción 2: PostgreSQL Local
+
+Si ya tienes PostgreSQL instalado:
 
 ```bash
 # Conectar a PostgreSQL
@@ -56,16 +97,6 @@ CREATE DATABASE tasks_db;
 
 # Salir
 \q
-```
-
-### Opción 2: PostgreSQL con Docker
-
-```bash
-docker run --name postgres-tasks \
-  -e POSTGRES_PASSWORD=postgres \
-  -e POSTGRES_DB=tasks_db \
-  -p 5432:5432 \
-  -d postgres:14
 ```
 
 ## 🔧 Configuración Detallada
@@ -88,11 +119,13 @@ docker run --name postgres-tasks \
    ```
 
 4. **Editar `.env` con tus credenciales**
+   
+   Si usas Docker Compose, las credenciales por defecto ya funcionan:
    ```env
    DB_HOST=localhost
    DB_PORT=5432
    DB_USERNAME=postgres
-   DB_PASSWORD=tu_password_aqui
+   DB_PASSWORD=postgres
    DB_DATABASE=tasks_db
    
    PORT=3000

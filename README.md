@@ -36,7 +36,7 @@ crud_tareas/
 
 - **Node.js** >= 18.x
 - **npm** >= 9.x
-- **PostgreSQL** >= 14.x
+- **Docker**
 - **Git**
 
 ## 🔧 Instalación y Configuración
@@ -48,7 +48,21 @@ git clone git@github.com:delapazfonseca21/crud_tareas.git
 cd crud_tareas
 ```
 
-### 2. Configurar Backend
+### 2. Levantar Base de Datos con Docker
+
+```bash
+# Levantar PostgreSQL con Docker
+docker run --name postgres-tasks \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=tasks_db \
+  -p 5432:5432 \
+  -d postgres:14-alpine
+
+# Verificar que está corriendo
+docker ps | grep postgres-tasks
+```
+
+### 3. Configurar Backend
 
 ```bash
 cd backend
@@ -58,19 +72,20 @@ npm install
 Crear archivo `.env` en la carpeta `backend/`:
 
 ```env
-# Database
+# Database (credenciales por defecto de Docker)
 DB_HOST=localhost
 DB_PORT=5432
 DB_USERNAME=postgres
-DB_PASSWORD=tu_password
+DB_PASSWORD=postgres
 DB_DATABASE=tasks_db
 
 # Application
 PORT=3000
 NODE_ENV=development
+CORS_ORIGIN=http://localhost:5173
 ```
 
-Ejecutar migraciones y levantar el servidor:
+Levantar el servidor:
 
 ```bash
 npm run start:dev
@@ -79,7 +94,7 @@ npm run start:dev
 El backend estará disponible en: `http://localhost:3000`
 Documentación Swagger: `http://localhost:3000/api`
 
-### 3. Configurar Frontend
+### 4. Configurar Frontend
 
 ```bash
 cd frontend
