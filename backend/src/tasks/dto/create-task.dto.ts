@@ -94,5 +94,5 @@ export class CreateTaskDto {
     {},
     { message: 'La fecha de vencimiento debe estar en formato ISO 8601' },
   )
-  dueDate?: Date;
+  dueDate?: string;
 }

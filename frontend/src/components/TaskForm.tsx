@@ -74,13 +74,32 @@ export function TaskForm({ task, onSubmit, onCancel, isLoading }: TaskFormProps)
    * Maneja el envío del formulario
    */
   const handleFormSubmit = (data: TaskFormData) => {
-    // Convertir fecha a ISO string si existe
-    const formattedData = {
-      ...data,
-      description: data.description || undefined,
-      dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : undefined,
+    // Convertir fecha a ISO string si existe y limpiar campos vacíos
+    const formattedData: any = {
+      title: data.title,
+      status: data.status,
+      priority: data.priority,
     };
 
+    // Solo agregar descripción si no está vacía
+    if (data.description && data.description.trim()) {
+      formattedData.description = data.description.trim();
+    }
+
+    // Solo agregar fecha si existe y no está vacía
+    if (data.dueDate && data.dueDate.trim() !== '') {
+      try {
+        const date = new Date(data.dueDate);
+        // Verificar que la fecha es válida
+        if (!isNaN(date.getTime())) {
+          formattedData.dueDate = date.toISOString();
+        }
+      } catch (e) {
+        console.error('Error al parsear fecha:', e);
+      }
+    }
+
+    console.log('📤 Datos a enviar:', formattedData);
     onSubmit(formattedData);
   };
 
